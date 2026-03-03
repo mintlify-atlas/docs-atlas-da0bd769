@@ -1,0 +1,203 @@
+---
+title: Functions
+description: Core Python functions used in Lightshot Scrape for generating URLs, handling images, and verification
+---
+
+This reference documents all core functions in the Lightshot Scrape Python CLI tool. These functions handle URL generation, image extraction, and verification.
+
+## ImageLinkGenerator
+
+Generates a random Lightshot URL by creating a random 12-character string.
+
+### Signature
+
+```python
+ImageLinkGenerator() -> str
+```
+
+### Parameters
+
+This function takes no parameters.
+
+### Returns
+
+<ResponseField name="link" type="string">
+  A random Lightshot URL in the format `https://prnt.sc/{random_string}` where `random_string` is a 12-character combination of uppercase letters, lowercase letters, and digits.
+</ResponseField>
+
+### Implementation details
+
+The function generates a random 12-character string using:
+- Lowercase letters (a-z)
+- Uppercase letters (A-Z)
+- Digits (0-9)
+
+The random string is appended to `https://prnt.sc/` to create a valid Lightshot URL.
+
+### Example
+
+<CodeGroup>
+
+```python Basic usage
+from lightshotscrape.singleImage import ImageLinkGenerator
+
+# Generate a random Lightshot URL
+link = ImageLinkGenerator()
+print(link)
+# Output: https://prnt.sc/Bz9iVlFAetPw (example)
+```
+
+```python Multiple URLs
+from lightshotscrape.singleImage import ImageLinkGenerator
+
+# Generate multiple random URLs
+for i in range(5):
+    link = ImageLinkGenerator()
+    print(f"Link {i+1}: {link}")
+```
+
+</CodeGroup>
+
+---
+
+## ImageHandler
+
+Extracts the actual image URL from a Lightshot page by scraping the HTML and finding the image source.
+
+### Signature
+
+```python
+ImageHandler(link: str) -> str | None
+```
+
+### Parameters
+
+<ParamField path="link" type="string" required>
+  The Lightshot URL to scrape (e.g., `https://prnt.sc/abc123`)
+</ParamField>
+
+### Returns
+
+<ResponseField name="img" type="string | None">
+  The direct image URL extracted from the Lightshot page, or `None` if an error occurs. The image URL typically points to the CDN where the actual image is hosted.
+</ResponseField>
+
+### Implementation details
+
+The function:
+1. Creates a cloudscraper instance to bypass Cloudflare protection
+2. Fetches the HTML content of the Lightshot page
+3. Parses the HTML using BeautifulSoup
+4. Finds the first `<img>` tag and extracts its `src` attribute
+5. Returns the image URL or prints an error if something fails
+
+### Example
+
+<CodeGroup>
+
+```python Basic usage
+from lightshotscrape.singleImage import ImageHandler, ImageLinkGenerator
+
+# Generate a random link and extract the image URL
+link = ImageLinkGenerator()
+img_url = ImageHandler(link)
+
+if img_url:
+    print(f"Image URL: {img_url}")
+else:
+    print("Failed to extract image")
+```
+
+```python With error handling
+from lightshotscrape.singleImage import ImageHandler
+import requests
+
+link = "https://prnt.sc/abc123"
+img_url = ImageHandler(link)
+
+if img_url and not img_url.startswith('http'):
+    print("Invalid image URL")
+elif img_url:
+    # Download the image
+    response = requests.get(img_url)
+    with open('image.png', 'wb') as f:
+        f.write(response.content)
+```
+
+```python Batch processing
+from lightshotscrape.singleImage import ImageHandler, ImageLinkGenerator
+
+# Process multiple random links
+successful = 0
+for i in range(10):
+    link = ImageLinkGenerator()
+    img_url = ImageHandler(link)
+    if img_url:
+        successful += 1
+        print(f"✓ Found image: {img_url}")
+    else:
+        print(f"✗ No image at {link}")
+
+print(f"\nSuccess rate: {successful}/10")
+```
+
+</CodeGroup>
+
+### Dependencies
+
+- **cloudscraper**: Used to bypass Cloudflare protection on Lightshot pages
+- **BeautifulSoup**: Parses HTML to extract image tags
+- **requests**: HTTP library (used indirectly through cloudscraper)
+
+<Note>
+  The function catches all exceptions and prints them to stdout, but does not raise them. Make sure to check if the return value is `None` before using it.
+</Note>
+
+---
+
+## ImageVerifier
+
+Verifies the validity of an image URL (currently a placeholder function).
+
+### Signature
+
+```python
+ImageVerifier(img: str) -> None
+```
+
+### Parameters
+
+<ParamField path="img" type="string" required>
+  The image URL to verify
+</ParamField>
+
+### Returns
+
+<ResponseField name="result" type="None">
+  Currently returns `None` as this function is not yet implemented.
+</ResponseField>
+
+### Implementation details
+
+<Warning>
+  This function is currently a placeholder with no implementation (`pass` statement). It does not perform any verification.
+</Warning>
+
+### Example
+
+```python
+from lightshotscrape.singleImage import ImageVerifier
+
+img_url = "https://example.com/image.png"
+ImageVerifier(img_url)
+# Currently does nothing
+```
+
+<Accordion title="Future implementation suggestions">
+  This function could be implemented to:
+  - Check if the image URL is accessible (HTTP 200 status)
+  - Verify the content type is an image
+  - Check if the image is a valid image file (not a 404 placeholder)
+  - Validate image dimensions or file size
+  - Filter out Lightshot's default "image not found" placeholder
+</Accordion>

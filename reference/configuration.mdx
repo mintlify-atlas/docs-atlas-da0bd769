@@ -1,0 +1,246 @@
+---
+title: Configuration
+description: Configuration options, command-line arguments, and dependencies for Lightshot Scrape
+---
+
+This page documents all configuration options available in Lightshot Scrape, including command-line arguments, file paths, and required dependencies.
+
+## Command-line arguments
+
+The Lightshot Scrape CLI accepts command-line arguments to control its behavior.
+
+### Mode selection
+
+<ParamField path="-m, --mode" type="string" required>
+  Specifies the operating mode for the scraper.
+  
+  **Accepted values:**
+  - `en` - Single image mode (scrapes one image)
+  - `loop` - Loop mode (continuously scrapes images)
+  
+  **Example:**
+  ```bash
+  python main.py -m en
+  python main.py --mode loop
+  ```
+</ParamField>
+
+### Usage examples
+
+<CodeGroup>
+
+```bash Single image mode
+python main.py -m en
+```
+
+```bash Loop mode
+python main.py -m loop
+```
+
+```bash Long form
+python main.py --mode en
+```
+
+</CodeGroup>
+
+<Warning>
+  If you run the script without specifying the mode argument, the program will exit with an error message: "Ange inställning ('-m en' eller '-m loop')"
+</Warning>
+
+### Argument parsing
+
+The tool uses Python's `getopt` module to parse command-line arguments:
+
+```python
+import getopt
+import sys
+
+nameargv = sys.argv[1:]
+
+try:
+    opts = getopt.getopt(nameargv, "m:", ["mode ="])
+    print(opts)
+except:
+    print("Ange inställning ('-m en' eller '-m loop')")
+    sys.exit(2)
+```
+
+---
+
+## File paths
+
+### Image save path
+
+By default, scraped images are saved to the Windows Pictures folder.
+
+<ParamField path="imgpath" type="string" default="C:\\Users\\%username%\\Pictures\\Saved Pictures">
+  The directory where downloaded images will be saved.
+  
+  **Default value:** `C:\Users\%username%\Pictures\Saved Pictures`
+  
+  **Note:** The `%username%` variable should be expanded by the system to the current user's username.
+</ParamField>
+
+### Configuration in code
+
+```python
+# Default save path
+imgpath = "C:\\Users\\%username%\\Pictures\\Saved Pictures"
+```
+
+<Note>
+  In the current implementation, there is commented-out code that would allow users to specify a custom save path via input. This feature is currently disabled:
+  
+  ```python
+  # Commented out in current version:
+  # imgpath = input("Var ska bilderna sparas? (Enter för att spara i Sparade Bilder)").strip() 
+  #          or "C:\\Users\\%username%\\Pictures\\Saved Pictures"
+  ```
+</Note>
+
+---
+
+## Dependencies
+
+Lightshot Scrape requires several Python packages to function properly.
+
+### Required packages
+
+<AccordionGroup>
+
+<Accordion title="cloudscraper" icon="cloud">
+  **Purpose:** Bypasses Cloudflare protection on Lightshot pages
+  
+  **Usage in code:**
+  ```python
+  import cloudscraper
+  
+  scraper = cloudscraper.create_scraper()
+  site = scraper.get(link).text
+  ```
+  
+  **Why it's needed:** Lightshot uses Cloudflare protection, which blocks regular requests. Cloudscraper mimics a real browser to bypass this protection.
+  
+  **Installation:**
+  ```bash
+  pip install cloudscraper
+  ```
+</Accordion>
+
+<Accordion title="beautifulsoup4" icon="code">
+  **Purpose:** Parses HTML to extract image URLs
+  
+  **Usage in code:**
+  ```python
+  from bs4 import BeautifulSoup
+  
+  soup = BeautifulSoup(site, 'html.parser')
+  img = soup.find_all('img')[0]
+  img = img['src']
+  ```
+  
+  **Why it's needed:** Extracts the image source URL from the Lightshot page HTML by finding `<img>` tags.
+  
+  **Installation:**
+  ```bash
+  pip install beautifulsoup4
+  ```
+</Accordion>
+
+<Accordion title="requests" icon="globe">
+  **Purpose:** HTTP library for making web requests
+  
+  **Usage in code:**
+  ```python
+  import requests
+  ```
+  
+  **Why it's needed:** Used as a dependency for cloudscraper and for downloading images.
+  
+  **Installation:**
+  ```bash
+  pip install requests
+  ```
+</Accordion>
+
+</AccordionGroup>
+
+### Standard library modules
+
+The following Python standard library modules are also used (no installation required):
+
+- `random` - Generates random characters for URL creation
+- `string` - Provides character sets (ascii_lowercase, ascii_uppercase, digits)
+- `time` - Time-related functions
+- `os` - Operating system interface
+- `sys` - System-specific parameters and functions
+- `getopt` - Command-line argument parser
+
+### Complete dependency list
+
+Create a `requirements.txt` file with these dependencies:
+
+```txt requirements.txt
+cloudscraper>=1.2.58
+beautifulsoup4>=4.9.3
+requests>=2.25.1
+```
+
+Install all dependencies with:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Environment requirements
+
+<CardGroup cols={2}>
+
+<Card title="Python version" icon="python">
+  Python 3.6 or higher recommended
+</Card>
+
+<Card title="Operating system" icon="windows">
+  Designed for Windows (default save path uses Windows directory structure)
+</Card>
+
+<Card title="Internet connection" icon="wifi">
+  Required to access Lightshot URLs and download images
+</Card>
+
+<Card title="Disk space" icon="hard-drive">
+  Sufficient space in the save directory for downloaded images
+</Card>
+
+</CardGroup>
+
+---
+
+## Cloudscraper instance
+
+The tool creates cloudscraper instances in multiple locations:
+
+### Global instance
+
+Created at module level in both `main.py` and `singleImage.py`:
+
+```python
+scraper = cloudscraper.create_scraper()
+```
+
+### Local instance
+
+The `ImageHandler` function creates its own instance:
+
+```python
+def ImageHandler(link):
+    scraper = cloudscraper.create_scraper()
+    site = scraper.get(link).text
+    # ...
+```
+
+<Tip>
+  Creating a new scraper instance for each request ensures fresh sessions and helps avoid rate limiting or blocking.
+</Tip>

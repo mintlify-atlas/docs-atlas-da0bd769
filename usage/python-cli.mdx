@@ -1,0 +1,164 @@
+---
+title: Python CLI
+description: Learn how to use the Lightshot Scrape Python command-line interface to scrape random images from prnt.sc
+---
+
+The Python CLI provides two modes for scraping random Lightshot images: single image mode and loop mode.
+
+## Prerequisites
+
+Before using the CLI, ensure you have:
+- Python 3.x installed
+- Required dependencies installed (see [Installation](/installation))
+- Write permissions to the Pictures folder
+
+## Command syntax
+
+The CLI requires a mode argument to specify how it should operate:
+
+```bash
+python main.py -m <mode>
+```
+
+### Available modes
+
+<Tabs>
+  <Tab title="Single image mode">
+    Use `-m en` to scrape a single random image:
+    
+    ```bash
+    python main.py -m en
+    ```
+    
+    This mode will:
+    - Generate one random Lightshot URL
+    - Download the image if available
+    - Save it to your Pictures folder
+    - Exit after completion
+  </Tab>
+  
+  <Tab title="Loop mode">
+    Use `-m loop` to continuously scrape images:
+    
+    ```bash
+    python main.py -m loop
+    ```
+    
+    This mode will:
+    - Continuously generate random Lightshot URLs
+    - Download each available image
+    - Keep running until manually stopped (Ctrl+C)
+  </Tab>
+</Tabs>
+
+## Usage examples
+
+<Steps>
+  <Step title="Navigate to the project directory">
+    Open your terminal and navigate to the lightshotscrape folder:
+    
+    ```bash
+    cd path/to/lightshotscrape
+    ```
+  </Step>
+  
+  <Step title="Run the scraper">
+    Execute the script with your desired mode:
+    
+    <CodeGroup>
+    ```bash Single image
+    python main.py -m en
+    ```
+    
+    ```bash Continuous loop
+    python main.py -m loop
+    ```
+    </CodeGroup>
+  </Step>
+  
+  <Step title="Check your saved images">
+    Images are automatically saved to:
+    
+    ```
+    C:\Users\%username%\Pictures\Saved Pictures
+    ```
+  </Step>
+</Steps>
+
+## How it works
+
+The scraper uses the following process:
+
+1. **URL Generation**: Creates random 12-character strings using letters (a-z, A-Z) and digits (0-9)
+2. **URL Format**: Constructs URLs in the format `https://prnt.sc/{random-string}`
+3. **Page Scraping**: Uses BeautifulSoup and cloudscraper to extract image URLs from the page
+4. **Image Download**: Downloads the actual image file from the extracted URL
+5. **Save**: Stores the image in the configured directory
+
+<Note>
+  The tool uses `cloudscraper` to bypass Cloudflare protection on the Lightshot website.
+</Note>
+
+## Error handling
+
+If you run the command without specifying a mode, you'll see:
+
+```bash
+Ange inställning ('-m en' eller '-m loop')
+```
+
+This Swedish message translates to "Enter setting ('-m en' or '-m loop')".
+
+<Warning>
+  Always include the `-m` flag with either `en` or `loop` as the mode argument.
+</Warning>
+
+## Sample output
+
+When running the script, you'll see the parsed arguments:
+
+```bash
+$ python main.py -m en
+([('-m', 'en')], [])
+# Script proceeds to scrape one image
+```
+
+```bash
+$ python main.py -m loop
+([('-m', 'loop')], [])
+# Script continuously scrapes images until stopped
+```
+
+## Stopping the loop mode
+
+To stop the continuous loop mode, press `Ctrl+C` in your terminal:
+
+```bash
+^C
+KeyboardInterrupt
+```
+
+## Default save location
+
+All scraped images are saved to:
+
+```
+C:\Users\%username%\Pictures\Saved Pictures
+```
+
+Where `%username%` is automatically replaced with your Windows username.
+
+<Note>
+  The save path is currently hardcoded in main.py:25. There was previously an option to customize it via input, but it's now commented out.
+</Note>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Windows GUI" icon="window" href="/usage/windows-gui">
+    Use the graphical interface for easier operation
+  </Card>
+  <Card title="Installation" icon="download" href="/installation">
+    Set up the tool on your system
+  </Card>
+</CardGroup>

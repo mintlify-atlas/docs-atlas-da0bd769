@@ -1,0 +1,191 @@
+---
+title: Installation
+description: Install Lightshot Scrape as a Python CLI tool or Windows GUI application
+---
+
+## Prerequisites
+
+Before installing Lightshot Scrape, ensure you have the following installed:
+
+<Steps>
+  <Step title="Python 3.x">
+    Download and install Python 3.x from [python.org](https://www.python.org/downloads/)
+  </Step>
+  
+  <Step title="pip package manager">
+    pip is included with Python 3.4+. Verify installation:
+    ```bash
+    pip --version
+    ```
+  </Step>
+</Steps>
+
+## Python CLI installation
+
+The Python CLI is the core component and is required for both standalone use and the Windows GUI.
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone <repository-url>
+    cd lightshotscrape
+    ```
+  </Step>
+  
+  <Step title="Create a virtual environment (recommended)">
+    ```bash
+    python -m venv .venv
+    ```
+    
+    Activate the virtual environment:
+    
+    <CodeGroup>
+    ```bash Windows
+    .venv\Scripts\activate
+    ```
+    
+    ```bash Linux/Mac
+    source .venv/bin/activate
+    ```
+    </CodeGroup>
+  </Step>
+  
+  <Step title="Install dependencies">
+    Install the required Python packages:
+    
+    ```bash
+    pip install requests beautifulsoup4 cloudscraper
+    ```
+    
+    <Note>
+    These packages provide:
+    - `requests` - HTTP library for making web requests
+    - `beautifulsoup4` - HTML parsing and scraping
+    - `cloudscraper` - Cloudflare bypass functionality
+    </Note>
+  </Step>
+  
+  <Step title="Verify installation">
+    Test the installation by running:
+    
+    ```bash
+    python lightshotscrape/singleImage.py
+    ```
+  </Step>
+</Steps>
+
+## Windows GUI installation
+
+The Windows GUI provides a desktop interface for the Python scraper. It requires the Python CLI to be installed first.
+
+<Warning>
+The Windows GUI only works on Windows and requires .NET 8.0 or later.
+</Warning>
+
+<Steps>
+  <Step title="Install .NET 8.0 SDK">
+    Download and install the [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) for Windows
+  </Step>
+  
+  <Step title="Complete Python CLI installation">
+    Follow all steps in the Python CLI installation section above, ensuring you create a virtual environment at `.venv` in the project root
+  </Step>
+  
+  <Step title="Build the GUI application">
+    Navigate to the GUI directory and build:
+    
+    ```bash
+    cd lightshotscrape-gui
+    dotnet build
+    ```
+  </Step>
+  
+  <Step title="Run the application">
+    ```bash
+    dotnet run
+    ```
+    
+    Or run the built executable from:
+    ```
+    lightshotscrape-gui/bin/Debug/net8.0-windows/lightshotscrape-gui.exe
+    ```
+  </Step>
+</Steps>
+
+## Dependency details
+
+### Python dependencies
+
+The Python CLI requires the following packages:
+
+| Package | Purpose | Import in code |
+|---------|---------|----------------|
+| requests | HTTP requests | `import requests` |
+| beautifulsoup4 | HTML parsing | `from bs4 import BeautifulSoup` |
+| cloudscraper | Cloudflare bypass | `import cloudscraper` |
+
+Install all at once:
+
+```bash
+pip install requests beautifulsoup4 cloudscraper
+```
+
+### .NET dependencies
+
+The Windows GUI uses:
+
+- **.NET 8.0 Windows** (`net8.0-windows`)
+- **Windows Forms** - Built-in UI framework
+- **System.Diagnostics** - For process management
+
+The GUI launches Python scripts using the virtual environment's Python executable:
+
+```csharp
+process.StartInfo.FileName = rootdir + "\\.venv\\Scripts\\python.exe";
+process.StartInfo.Arguments = rootdir + "\\lightshotscrape\\singleImage.py ";
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Virtual environment not found">
+    The Windows GUI expects a virtual environment at `.venv` in the project root. Ensure you create it there:
+    
+    ```bash
+    python -m venv .venv
+    ```
+  </Accordion>
+  
+  <Accordion title="Module not found errors">
+    Activate your virtual environment and reinstall dependencies:
+    
+    ```bash
+    .venv\Scripts\activate
+    pip install requests beautifulsoup4 cloudscraper
+    ```
+  </Accordion>
+  
+  <Accordion title="GUI can't find Python script">
+    The GUI uses relative paths from the project root. Ensure your directory structure is:
+    ```
+    project-root/
+    ├── .venv/
+    ├── lightshotscrape/
+    │   └── singleImage.py
+    └── lightshotscrape-gui/
+        └── Form1.cs
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Usage guide" icon="play" href="/usage/python-cli">
+    Learn how to use the CLI and GUI to scrape images
+  </Card>
+  
+  <Card title="Configuration" icon="gear" href="/reference/configuration">
+    Configure save paths and scraping modes
+  </Card>
+</CardGroup>

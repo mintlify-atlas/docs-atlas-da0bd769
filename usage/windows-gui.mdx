@@ -1,0 +1,190 @@
+---
+title: Windows GUI
+description: Learn how to use the Lightshot Scrape Windows GUI application to scrape random images with a simple click
+---
+
+The Windows GUI provides a user-friendly graphical interface for the Lightshot scraper, built with C# WinForms.
+
+## Overview
+
+The GUI wrapper allows you to scrape random Lightshot images without using the command line. It runs the Python scraper in the background and provides visual feedback.
+
+## Prerequisites
+
+Before using the GUI, ensure you have:
+- Windows operating system
+- .NET Framework installed
+- Python 3.x with virtual environment set up
+- Python dependencies installed in the `.venv` folder
+
+<Warning>
+  The GUI expects a virtual environment at `../.venv/Scripts/python.exe` relative to the project root. Ensure this is properly configured during installation.
+</Warning>
+
+## Interface
+
+The GUI application features a simple, minimalist interface:
+
+- **"Ny Bild" button** ("New Image" in Swedish): Click to scrape a single random image
+- **Status messages**: Dialog boxes provide feedback on the scraping process
+
+## Using the application
+
+<Steps>
+  <Step title="Launch the application">
+    Double-click the executable or run the application from Visual Studio:
+    
+    ```bash
+    lightshotscrape-gui.exe
+    ```
+  </Step>
+  
+  <Step title="Click the button">
+    Click the **"Ny Bild"** button to scrape a single random image.
+    
+    The application will:
+    - Start the Python scraper in the background
+    - Execute `singleImage.py` with the virtual environment Python
+    - Process the output without showing a console window
+  </Step>
+  
+  <Step title="View results">
+    Check the saved images folder:
+    
+    ```
+    C:\Users\%username%\Pictures\Saved Pictures
+    ```
+  </Step>
+</Steps>
+
+## How it works
+
+The GUI application operates by:
+
+1. **Process Creation**: Creates a new Python process when you click the button
+2. **Script Execution**: Runs `singleImage.py` using the virtual environment's Python interpreter
+3. **Background Operation**: Executes without showing a console window (`CreateNoWindow = true`)
+4. **Output Capture**: Redirects standard output to capture any messages
+5. **Event Handling**: Displays message boxes for process output and completion
+
+## Technical details
+
+### Python process configuration
+
+The GUI configures the Python process with these settings:
+
+```csharp
+process.StartInfo.FileName = rootdir + "\\.venv\\Scripts\\python.exe";
+process.StartInfo.Arguments = rootdir + "\\lightshotscrape\\singleImage.py";
+process.StartInfo.UseShellExecute = false;
+process.StartInfo.CreateNoWindow = true;
+process.StartInfo.RedirectStandardOutput = true;
+```
+
+### Project structure detection
+
+The application automatically detects the project root directory:
+
+```csharp
+string rootdir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName;
+```
+
+This navigates up the directory tree to find the project root containing both the GUI and Python components.
+
+## Status messages
+
+<Tabs>
+  <Tab title="Success">
+    When the process completes successfully:
+    
+    ```
+    Processen avslutades
+    ```
+    
+    ("The process finished" in Swedish)
+  </Tab>
+  
+  <Tab title="Error">
+    If the path cannot be found:
+    
+    ```
+    Kunde inte hitta sökvägen till lightshotscrape.py
+    ```
+    
+    ("Could not find the path to lightshotscrape.py" in Swedish)
+  </Tab>
+  
+  <Tab title="Output">
+    Any output from the Python script is displayed in a message box via the `OutputDataReceived` event handler.
+  </Tab>
+</Tabs>
+
+## Limitations
+
+<Warning>
+  The current GUI implementation only supports single image scraping. Loop mode is not available through the graphical interface.
+</Warning>
+
+Key limitations:
+- Only scrapes one image per button click
+- Requires manual clicking for each new image
+- No progress indicator during scraping
+- No built-in image viewer or manager
+
+## Error handling
+
+The GUI handles several error scenarios:
+
+1. **Missing path**: Shows an error if the Python script path cannot be resolved
+2. **Process errors**: Captures exceptions from the Python process
+3. **Output errors**: Displays any error messages from the script
+
+## File locations
+
+### GUI executable
+
+After building the project:
+
+```
+lightshotscrape-gui/bin/Debug/net6.0-windows/lightshotscrape-gui.exe
+```
+
+### Required Python files
+
+The GUI expects these files relative to the project root:
+
+```
+.venv/Scripts/python.exe
+lightshotscrape/singleImage.py
+```
+
+### Saved images
+
+All scraped images are saved to:
+
+```
+C:\Users\%username%\Pictures\Saved Pictures
+```
+
+<Note>
+  This is the same location used by the Python CLI, ensuring consistency across both interfaces.
+</Note>
+
+## Advantages over CLI
+
+- No need to open a terminal
+- Simple one-click operation
+- Visual feedback through dialog boxes
+- No command-line arguments to remember
+- Integrated into Windows environment
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Python CLI" icon="terminal" href="/usage/python-cli">
+    Use the command-line interface for loop mode
+  </Card>
+  <Card title="Installation" icon="download" href="/installation">
+    Set up the tool on your system
+  </Card>
+</CardGroup>

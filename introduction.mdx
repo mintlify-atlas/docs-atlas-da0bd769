@@ -1,0 +1,76 @@
+---
+title: Introduction
+description: A CLI tool for scraping random images from Lightshot by generating random prnt.sc URLs
+---
+
+## Welcome to Lightshot Scrape
+
+Lightshot Scrape is a tool that discovers random images from Lightshot (prnt.sc) by generating random URLs and extracting the hosted images. The project includes both a Python CLI version for automation and a Windows GUI wrapper for easy desktop use.
+
+## How it works
+
+The tool generates random 12-character URLs in the format `https://prnt.sc/[random]`, scrapes the page to find the image source, and saves it to your local system.
+
+<CodeGroup>
+```python Python - URL Generation
+def ImageLinkGenerator():
+    linkEnd = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for _ in range(12))
+    link = "https://prnt.sc/" + linkEnd
+    return link
+```
+
+```python Python - Image Extraction
+def ImageHandler(link):
+    scraper = cloudscraper.create_scraper()
+    site = scraper.get(link).text
+    soup = BeautifulSoup(site, 'html.parser')
+    img = soup.find_all('img')[0]
+    img = img['src']
+    return img
+```
+</CodeGroup>
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Random discovery" icon="shuffle">
+    Generates random Lightshot URLs to discover images uploaded by users worldwide
+  </Card>
+  
+  <Card title="Cloudflare bypass" icon="shield">
+    Uses cloudscraper to bypass Cloudflare protection on prnt.sc
+  </Card>
+  
+  <Card title="Dual interface" icon="window-restore">
+    Available as both a Python CLI tool and a Windows GUI application
+  </Card>
+  
+  <Card title="Automated scraping" icon="robot">
+    Supports both single-image mode and continuous loop mode
+  </Card>
+</CardGroup>
+
+## Get started
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Install the Python CLI or Windows GUI version
+  </Card>
+  
+  <Card title="Usage" icon="play" href="/usage/python-cli">
+    Learn how to scrape images using the CLI or GUI
+  </Card>
+</CardGroup>
+
+<Note>
+This tool is designed for educational purposes. Always respect copyright and privacy when using scraped content.
+</Note>
+
+## Architecture
+
+The project consists of two main components:
+
+- **Python CLI** (`lightshotscrape/`) - Core scraping functionality with command-line interface
+- **Windows GUI** (`lightshotscrape-gui/`) - C# WinForms wrapper that executes the Python scripts
+
+The GUI application launches the Python scripts in a subprocess and displays the results in a Windows desktop interface.
