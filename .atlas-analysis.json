@@ -1,0 +1,48 @@
+{
+  "projectType": "cli-tool",
+  "projectName": "Lightshot Scrape",
+  "projectDescription": "A tool for scraping random images from Lightshot by generating and fetching random prnt.sc URLs",
+  "theme": "aspen",
+  "primaryColor": "#3B82F6",
+  "lightColor": "#60A5FA",
+  "darkColor": "#2563EB",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "installation"
+        ]
+      },
+      {
+        "group": "Usage",
+        "pages": [
+          "usage/python-cli",
+          "usage/windows-gui"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/functions",
+          "reference/configuration"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Random Lightshot URL generation",
+    "Automated image scraping from prnt.sc",
+    "Python CLI interface",
+    "Windows GUI wrapper",
+    "CloudScraper integration for bypassing protection"
+  ],
+  "publicApiSurface": [
+    "ImageLinkGenerator() - Generates random Lightshot URLs",
+    "ImageHandler(link) - Extracts image URL from Lightshot page",
+    "ImageVerifier(img) - Validates scraped images",
+    "singleImage.py - Single image scraping script",
+    "main.py - Main CLI entry point with mode selection"
+  ]
+}
